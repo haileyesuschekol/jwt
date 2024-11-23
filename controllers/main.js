@@ -1,6 +1,5 @@
 const jwt = require("jsonwebtoken")
 const CustomAPIError = require("../errors/custom-error")
-const { json } = require("express")
 
 const login = async (req, res) => {
   const { username, password } = req.body
@@ -17,25 +16,10 @@ const login = async (req, res) => {
 }
 
 const dashboard = (req, res) => {
-  const { authorization } = req.headers
-
-  if (!authorization || !authorization.startsWith("Bearer")) {
-    throw new CustomAPIError("Token required!", 401)
-  }
-
-  const token = authorization.split(" ")[1]
-
-  try {
-    const decode = jwt.verify(token, process.env.JWT_SECRET)
-    const luckNumber = Math.floor(Math.random() * 100)
-    res
-      .status(200)
-      .json({
-        msg: `Hello, ${decode.username}`,
-        secret: `Here is your lucky number ${luckNumber}`,
-      })
-  } catch (error) {
-    throw new CustomAPIError("Unauthorized!", 401)
-  }
+  const luckNumber = Math.floor(Math.random() * 100)
+  res.status(200).json({
+    msg: `Hello, ${req.user.username}`,
+    secret: `Here is your lucky number ${luckNumber}`,
+  })
 }
 module.exports = { login, dashboard }
